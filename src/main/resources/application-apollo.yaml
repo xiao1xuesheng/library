@@ -1,0 +1,10 @@
+# Apollo配置中心配置
+app:
+  id: ELibrary
+apollo:
+  meta: ${APOLLO_META:http://localhost:8080}
+  bootstrap:
+    enabled: true
+    namespaces: application
+    eagerLoad:
+      enabled: true

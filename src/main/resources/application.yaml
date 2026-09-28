@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: ELibrary
+  datasource:
+    url: jdbc:h2:mem:elibrary;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+server:
+  port: 8080
+
+# Nacos配置（开发环境不启用）
+nacos:
+  server-addr: 
+  namespace: 
+  group: elibrary
+
+# 本地配置（Nacos不可用时使用）
+elibrary:
+  borrow:
+    max-limit-free: 3
+    max-limit-vip: 10
+    duration-free: 7
+    duration-vip: 30
+    daily-price-default: 1.00
+    vip-discount-default: 0.80
+    preview-pages: 10
+    preview-percent: 0.05
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] [%X{traceId}] [%X{adminId}] %-5level %logger{36} - %msg%n"
+  level:
+    org.hejinggang.elibrary: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# SpringDoc OpenAPI 配置
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+# Knife4j 配置
+knife4j:
+  enable: true
+  setting:
+    language: zh-CN
+    swagger-model-name: 实体类列表
