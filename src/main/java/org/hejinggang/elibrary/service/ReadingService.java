@@ -3,8 +3,9 @@ package org.hejinggang.elibrary.service;
 import org.hejinggang.elibrary.common.enums.BorrowStatus;
 import org.hejinggang.elibrary.common.exception.BusinessException;
 import org.hejinggang.elibrary.common.exception.ErrorCode;
+import org.hejinggang.elibrary.model.dto.response.ReadingHistoryResponse;
+import org.hejinggang.elibrary.model.dto.response.ReadingProgressResponse;
 import org.hejinggang.elibrary.model.entity.Book;
-import org.hejinggang.elibrary.model.entity.BorrowRecord;
 import org.hejinggang.elibrary.model.entity.ReadingHistory;
 import org.hejinggang.elibrary.repository.BookRepository;
 import org.hejinggang.elibrary.repository.BorrowRecordRepository;
@@ -14,9 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReadingService {
@@ -35,8 +33,8 @@ public class ReadingService {
 
     @Transactional
     public ReadingProgressResponse saveReadingProgress(Long userId, Long bookId, Integer page,
-                                                        String chapter, Integer scrollPosition,
-                                                        Integer readDuration, String deviceType) {
+                                                       String chapter, Integer scrollPosition,
+                                                       Integer readDuration, String deviceType) {
         boolean hasBorrowed = borrowRecordRepository
                 .findByUserIdAndBookIdAndStatus(userId, bookId, BorrowStatus.ACTIVE)
                 .isPresent();

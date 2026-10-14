@@ -2,8 +2,8 @@ package org.hejinggang.elibrary.controller.web;
 
 import org.hejinggang.elibrary.common.response.ApiResponse;
 import org.hejinggang.elibrary.config.AuthContext;
-import org.hejinggang.elibrary.service.ReadingHistoryResponse;
-import org.hejinggang.elibrary.service.ReadingProgressResponse;
+import org.hejinggang.elibrary.model.dto.response.ReadingHistoryResponse;
+import org.hejinggang.elibrary.model.dto.response.ReadingProgressResponse;
 import org.hejinggang.elibrary.service.ReadingService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;

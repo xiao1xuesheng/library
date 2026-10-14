@@ -104,17 +104,11 @@
             <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
-        <!-- SpringDoc OpenAPI -->
+        <!-- SpringDoc OpenAPI (已包含 Swagger UI,无需 Knife4j) -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>3.1.1</version>
-        </dependency>
-        <!-- Knife4j Next (兼容 Spring Boot 4, 支持离线文档导出) -->
-        <dependency>
-            <groupId>com.baizhukui</groupId>
-            <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
-            <version>5.0.0</version>
         </dependency>
     </dependencies>
 

@@ -3,6 +3,8 @@ package org.hejinggang.elibrary.service;
 import org.hejinggang.elibrary.common.enums.BorrowStatus;
 import org.hejinggang.elibrary.common.exception.BusinessException;
 import org.hejinggang.elibrary.common.exception.ErrorCode;
+import org.hejinggang.elibrary.model.dto.response.ReadingHistoryResponse;
+import org.hejinggang.elibrary.model.dto.response.ReadingProgressResponse;
 import org.hejinggang.elibrary.model.entity.Book;
 import org.hejinggang.elibrary.model.entity.BorrowRecord;
 import org.hejinggang.elibrary.model.entity.ReadingHistory;

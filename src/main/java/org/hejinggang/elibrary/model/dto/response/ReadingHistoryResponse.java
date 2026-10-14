@@ -1,4 +1,4 @@
-package org.hejinggang.elibrary.service;
+package org.hejinggang.elibrary.model.dto.response;
 
 import lombok.Data;
 
