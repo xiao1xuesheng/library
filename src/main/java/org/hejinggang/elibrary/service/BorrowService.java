@@ -11,6 +11,8 @@ import org.hejinggang.elibrary.model.dto.request.BorrowRequest;
 import org.hejinggang.elibrary.model.dto.response.BorrowRecordResponse;
 import org.hejinggang.elibrary.model.entity.*;
 import org.hejinggang.elibrary.repository.*;
+import org.hejinggang.elibrary.service.pricing.PricingStrategy;
+import org.hejinggang.elibrary.service.pricing.PricingStrategyFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class BorrowService {
     private final AccountBalanceLogRepository balanceLogRepository;
     private final BookAccessConfigRepository accessConfigRepository;
     private final BorrowConfig borrowConfig;
+    private final PricingStrategyFactory pricingStrategyFactory;
 
     public BorrowService(BorrowRecordRepository borrowRecordRepository,
                          BookRepository bookRepository,
@@ -37,7 +40,8 @@ public class BorrowService {
                          AccountRepository accountRepository,
                          AccountBalanceLogRepository balanceLogRepository,
                          BookAccessConfigRepository accessConfigRepository,
-                         BorrowConfig borrowConfig) {
+                         BorrowConfig borrowConfig,
+                         PricingStrategyFactory pricingStrategyFactory) {
         this.borrowRecordRepository = borrowRecordRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
@@ -45,6 +49,7 @@ public class BorrowService {
         this.balanceLogRepository = balanceLogRepository;
         this.accessConfigRepository = accessConfigRepository;
         this.borrowConfig = borrowConfig;
+        this.pricingStrategyFactory = pricingStrategyFactory;
     }
 
     @Transactional
@@ -85,7 +90,8 @@ public class BorrowService {
                     return accessConfigRepository.save(defaultConfig);
                 });
 
-        BigDecimal dailyCost = calculateDailyCost(config, user);
+        PricingStrategy pricingStrategy = pricingStrategyFactory.getStrategy(config.getAccessType());
+        BigDecimal dailyCost = pricingStrategy.calculateDailyCost(config, user);
         int borrowDays = user.getUserType() == UserType.VIP ? borrowConfig.getDurationVip() : borrowConfig.getDurationFree();
         BigDecimal totalCost = dailyCost.multiply(new BigDecimal(borrowDays));
 
@@ -165,8 +171,9 @@ public class BorrowService {
             throw new BusinessException(ErrorCode.RENEW_LIMIT_EXCEEDED, "Renew limit exceeded");
         }
 
-        int renewDays = user.getUserType() == UserType.VIP ? config.getRenewDaysVip() : config.getRenewDaysFree();
-        BigDecimal dailyCost = calculateDailyCost(config, user);
+        PricingStrategy pricingStrategy = pricingStrategyFactory.getStrategy(config.getAccessType());
+        int renewDays = pricingStrategy.calculateRenewDays(config, user);
+        BigDecimal dailyCost = pricingStrategy.calculateDailyCost(config, user);
         BigDecimal renewCost = dailyCost.multiply(new BigDecimal(renewDays));
 
         Account account = accountRepository.findByUserIdForUpdate(userId)
@@ -221,18 +228,6 @@ public class BorrowService {
                     .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Book not found"));
             return toResponse(record, book.getTitle(), book.getCoverUrl());
         }).collect(Collectors.toList());
-    }
-
-    private BigDecimal calculateDailyCost(BookAccessConfig config, User user) {
-        if (config.getAccessType().equals("PUBLIC_FREE") || config.getAccessType().equals("VIP_FREE")) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal basePrice = config.getDailyPrice();
-        if (user.getUserType() == UserType.VIP) {
-            return basePrice.multiply(config.getVipDiscount());
-        }
-        return basePrice;
     }
 
     private Account createAccountIfNotExist(Long userId) {

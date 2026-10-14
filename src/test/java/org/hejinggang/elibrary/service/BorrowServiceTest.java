@@ -10,6 +10,8 @@ import org.hejinggang.elibrary.model.dto.request.BorrowRequest;
 import org.hejinggang.elibrary.model.dto.response.BorrowRecordResponse;
 import org.hejinggang.elibrary.model.entity.*;
 import org.hejinggang.elibrary.repository.*;
+import org.hejinggang.elibrary.service.pricing.PricingStrategy;
+import org.hejinggang.elibrary.service.pricing.PricingStrategyFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,6 +51,12 @@ class BorrowServiceTest {
 
     @Mock
     private BorrowConfig borrowConfig;
+
+    @Mock
+    private PricingStrategyFactory pricingStrategyFactory;
+
+    @Mock
+    private PricingStrategy pricingStrategy;
 
     @InjectMocks
     private BorrowService borrowService;
@@ -118,6 +126,8 @@ class BorrowServiceTest {
         when(accessConfigRepository.findByBookId(1L)).thenReturn(Optional.of(testConfig));
         when(borrowConfig.getMaxLimitFree()).thenReturn(3);
         when(borrowConfig.getDurationFree()).thenReturn(7);
+        when(pricingStrategyFactory.getStrategy("PUBLIC_FREE")).thenReturn(pricingStrategy);
+        when(pricingStrategy.calculateDailyCost(any(), any())).thenReturn(BigDecimal.ZERO);
         when(accountRepository.findByUserIdForUpdate(1L)).thenReturn(Optional.of(testAccount));
         when(borrowRecordRepository.save(any(BorrowRecord.class))).thenReturn(testRecord);
 
@@ -212,6 +222,8 @@ class BorrowServiceTest {
         when(accessConfigRepository.findByBookId(1L)).thenReturn(Optional.of(testConfig));
         when(borrowConfig.getMaxLimitFree()).thenReturn(3);
         when(borrowConfig.getDurationFree()).thenReturn(7);
+        when(pricingStrategyFactory.getStrategy("PAID")).thenReturn(pricingStrategy);
+        when(pricingStrategy.calculateDailyCost(any(), any())).thenReturn(new BigDecimal("10"));
         when(accountRepository.findByUserIdForUpdate(1L)).thenReturn(Optional.of(testAccount));
 
         BusinessException ex = assertThrows(BusinessException.class,
@@ -255,6 +267,9 @@ class BorrowServiceTest {
         when(borrowRecordRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(testRecord));
         when(accessConfigRepository.findByBookId(1L)).thenReturn(Optional.of(testConfig));
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(pricingStrategyFactory.getStrategy("PUBLIC_FREE")).thenReturn(pricingStrategy);
+        when(pricingStrategy.calculateRenewDays(any(), any())).thenReturn(7);
+        when(pricingStrategy.calculateDailyCost(any(), any())).thenReturn(BigDecimal.ZERO);
         when(accountRepository.findByUserIdForUpdate(1L)).thenReturn(Optional.of(testAccount));
         when(borrowRecordRepository.save(any(BorrowRecord.class))).thenReturn(testRecord);
         when(bookRepository.findById(1L)).thenReturn(Optional.of(testBook));
